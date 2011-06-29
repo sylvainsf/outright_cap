@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "outright_cap"
   s.version     = OutrightCap::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Write your name"]
-  s.email       = ["Write your email address"]
+  s.authors     = ["bob"]
+  s.email       = ["bob@example.com"]
   s.homepage    = ""
   s.summary     = %q{Write a gem summary}
   s.description = %q{Write a gem description}
