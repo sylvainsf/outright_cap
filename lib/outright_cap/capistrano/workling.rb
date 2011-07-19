@@ -18,7 +18,9 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Recover workling jobs"
     task :recover, :roles => :workling_recover do
-      exit if capture("ps -ef | grep workling | grep -v grep | wc -l").chomp.to_i > 0
+      run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
+        raise "Workling processes are still running on #{channel[:host]}" if data.to_i > 0
+      end
       run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
 
