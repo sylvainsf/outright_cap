@@ -18,8 +18,11 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Recover workling jobs"
     task :recover, :roles => :workling_recover do
-      run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
-        raise "Workling processes are still running on #{channel[:host]}" if data.to_i > 0
+      1.upto(10) do |i|
+        run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
+          break if data.to_i == 0
+          raise "Workling processes are still running on #{channel[:host]}" if (data.to_i > 0 && i == 10)
+        end
       end
       run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
