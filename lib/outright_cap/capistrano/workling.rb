@@ -23,6 +23,7 @@ Capistrano::Configuration.instance(:must_exist).load do
           break if data.to_i == 0
           raise "Workling processes are still running on #{channel[:host]}" if (data.to_i > 0 && i == 10)
         end
+        sleep(5)
       end
       run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
