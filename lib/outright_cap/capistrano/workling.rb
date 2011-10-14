@@ -19,9 +19,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Recover workling jobs"
     task :recover, :roles => :workling_recover do
       1.upto(10) do |i|
-        worklings_stopped = false
+        worklings_stopped = true
         run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
-          worklings_stopped = true if data.to_i == 0
+          worklings_stopped = false if data.to_i != 0
           raise "Workling processes are still running on #{channel[:host]}" if (data.to_i > 0 && i == 10)
         end
         break if worklings_stopped
