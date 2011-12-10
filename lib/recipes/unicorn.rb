@@ -27,7 +27,13 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Restart unicorn"
     task :restart, :roles => [:app], :except => { :no_release => true } do
-      sudo "kill -USR2 `cat #{unicorn_pid}`", :on_no_matching_servers => :continue
+      if find_servers(options).any?
+        pid = capture("ps -ef | grep unicorn | grep -v grep | grep master | awk '{print $2 }'").chomp
+        sudo "kill -USR2 `cat #{unicorn_pid}`"
+        
+        # Block until the new process is up
+        run "while [ `ps -ef | grep unicorn | grep -v grep | grep master | awk '{ print $2 }'` -eq #{pid} ] ; do sleep 1; done ;"
+      end
     end
 
     desc "Reopen log files"
