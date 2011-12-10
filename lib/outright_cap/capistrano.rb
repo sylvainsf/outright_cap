@@ -31,21 +31,6 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     servers
   end
-
-  def install_gem(name, options = {})
-    version = options[:version]
-    gem_cmd = "gem"
-
-    if options[:source]
-      source = "--source #{options[:source]}"
-    end
-
-    if version
-      run "#{gem_cmd} list | grep '#{name}' | grep '#{version}' || #{sudo} #{gem_cmd} install #{name} #{source} --version '= #{version}' --no-rdoc --no-ri"
-    else
-      run "#{gem_cmd} list | grep '#{name}' || #{sudo} #{gem_cmd} install #{name} #{source} --no-rdoc --no-ri"
-    end
-  end
 end
 
 require 'outright_cap/capistrano/apt'
