@@ -7,8 +7,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Start workling processes"
     task :start, :roles => :workling do
-      workling.start_general_worklings        if get_servers(self, :role => :workling, :queue => "general").size > 0
-      workling.start_manual_import_worklings  if get_servers(self, :role => :workling, :queue => "manual_import").size > 0
+      workling.start_general_worklings
+      workling.start_manual_import_worklings
     end
 
     desc "Stop workling processes"
@@ -47,14 +47,16 @@ Capistrano::Configuration.instance(:must_exist).load do
           "deferred_method_workers__process"
         ]
 
-        run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start"
+        run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start", :on_no_matching_servers => :continue
       end
     end
 
     task :start_manual_import_worklings, :roles => :workling, :only => { :queue => 'manual_import' } do
       number_worklings.times do
-        run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start"
+        run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start", :on_no_matching_servers => :continue
       end
     end
   end
+  
+  after "workling:stop", "workling:recover"
 end
