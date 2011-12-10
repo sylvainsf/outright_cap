@@ -33,9 +33,9 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 end
 
-require 'outright_cap/capistrano/apt'
-require 'outright_cap/capistrano/sqs'
-require 'outright_cap/capistrano/unicorn'
-require 'outright_cap/capistrano/workling'
-require 'outright_cap/capistrano/nginx'
-require 'outright_cap/capistrano/thrift'
+require 'outright_cap/recipes/apt'
+require 'outright_cap/recipes/sqs'
+require 'outright_cap/recipes/unicorn'
+require 'outright_cap/recipes/workling'
+require 'outright_cap/recipes/nginx'
+require 'outright_cap/recipes/thrift'
