@@ -17,7 +17,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc "Recover workling jobs"
-    task :recover, :roles => :workling_recover do
+    task :recover, :roles => :workling do
       1.upto(10) do |i|
         worklings_stopped = true
         run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
@@ -27,7 +27,8 @@ Capistrano::Configuration.instance(:must_exist).load do
         break if worklings_stopped
         sleep(5)
       end
-      run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
+      
+      run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover", :once => true
     end
 
     desc "Kill workling processes"
@@ -59,4 +60,12 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
   
   after "workling:stop", "workling:recover"
+  
+  # Deploy
+  before "deploy:finalize_update", "workling:stop"
+  after "deploy:finalize_update", "workling:start"
+  
+  # Rollback
+  before "deploy:rollback", "workling:stop"
+  after "deploy:rollback", "workling:start"
 end

@@ -15,4 +15,6 @@ Capistrano::Configuration.instance(:must_exist).load do
       sudo "/etc/init.d/nginx stop"
     end
   end
+  
+  after "deploy:cold", "nginx:start"
 end
