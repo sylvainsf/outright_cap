@@ -13,7 +13,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Stop workling processes"
     task :stop, :roles => :workling do
-      run "cd #{release_path}; export RAILS_ENV=#{rails_env}; script/workling_client stop"
+      run "cd #{previous_release}; export RAILS_ENV=#{rails_env}; script/workling_client stop"
     end
 
     desc "Recover workling jobs"
