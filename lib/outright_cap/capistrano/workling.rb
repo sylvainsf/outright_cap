@@ -7,8 +7,8 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Start workling processes"
     task :start, :roles => :workling do
-      workling.start_general_worklings
-      workling.start_manual_import_worklings
+      workling.start_general_worklings        if get_servers(self, :role => :workling, :queue => "general").size > 0
+      workling.start_manual_import_worklings  if get_servers(self, :role => :workling, :queue => "manual_import").size > 0
     end
 
     desc "Stop workling processes"
@@ -17,7 +17,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     end
 
     desc "Recover workling jobs"
-    task :recover, :roles => :workling do
+    task :recover, :roles => :workling_recover do
       1.upto(10) do |i|
         worklings_stopped = true
         run("ps -ef | grep workling | grep -v grep | wc -l", :roles => [:workling]) do |channel, stream, data|
@@ -27,7 +27,6 @@ Capistrano::Configuration.instance(:must_exist).load do
         break if worklings_stopped
         sleep(5)
       end
-
       run "cd #{release_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
 
@@ -48,24 +47,14 @@ Capistrano::Configuration.instance(:must_exist).load do
           "deferred_method_workers__process"
         ]
 
-        run "cd #{release_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start", :on_no_matching_servers => :continue
+        run "cd #{release_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start"
       end
     end
 
     task :start_manual_import_worklings, :roles => :workling, :only => { :queue => 'manual_import' } do
       number_worklings.times do
-        run "cd #{release_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start", :on_no_matching_servers => :continue
+        run "cd #{release_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start"
       end
     end
   end
-  
-  after "workling:stop", "workling:recover"
-  
-  # Deploy
-  before "deploy:finalize_update", "workling:stop"
-  after "deploy:finalize_update", "workling:start"
-  
-  # Rollback
-  before "deploy:rollback", "workling:stop"
-  after "deploy:rollback", "workling:start"
 end
