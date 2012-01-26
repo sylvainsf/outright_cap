@@ -7,8 +7,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   end
 
   def install_package(name)
-    run "dpkg -l | grep #{name} || #{sudo} aptitude install -y #{name}", :shell => "sh"
+    run "dpkg -l | grep #{name} || #{sudo} aptitude install -y #{name}"
   end
-  
-  after "deploy:setup", "apt:install"
 end
