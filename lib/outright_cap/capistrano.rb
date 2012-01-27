@@ -3,8 +3,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   _cset(:unicorn_config) { "#{current_path}/config/unicorn.rb" }
   _cset(:unicorn_pid) { "#{shared_path}/pids/unicorn.pid" }
 
-  after "workling:stop", "workling:recover"
-
   def pid_is_running?(full_path)
     "0" == capture("if [ -f #{full_path} ] ; then cat #{full_path} | xargs sudo kill -0 ; echo $? ; fi ;").strip
   end
