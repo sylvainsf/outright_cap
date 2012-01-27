@@ -27,7 +27,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         break if worklings_stopped
         sleep(5)
       end
-      run "cd #{release_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
+      run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
 
     desc "Kill workling processes"
