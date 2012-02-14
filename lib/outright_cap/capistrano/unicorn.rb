@@ -22,7 +22,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Start unicorn from scratch"
     task :start, :roles => [:app], :except => { :no_release => true } do
       if !pid_is_running?(unicorn_pid)
-        run "cd #{current_path}; #{sudo} bundle exec unicorn_rails -c #{unicorn_config} -E #{rails_env} -D || ( tail -100 #{current_path}/log/unicorn.errors ; exit 1 )"
+        run "bash -l -c \"cd #{current_path};bundle exec unicorn_rails -c #{unicorn_config} -E #{rails_env} -D\""
       else
         logger.info "Unicorn already started. Doing nothing."
       end
@@ -31,7 +31,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Gracefully stop unicorn from serving requests"
     task :stop, :roles => [:app], :except => { :no_release => true } do
       if pid_is_running?(unicorn_pid)
-        run "#{sudo} kill -QUIT `cat #{unicorn_pid}`; #{sudo} rm #{unicorn_pid}"
+        run "kill -QUIT `cat #{unicorn_pid}`;rm #{unicorn_pid}"
         unicorn.tail.stop
       else
         logger.info "Unicorn is not running. Doing nothing."
@@ -40,7 +40,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Update unicorn without dropping any connections"
     task :upgrade, :roles => [:app], :except => { :no_release => true } do
-      sudo "kill -USR2 `cat #{unicorn_pid}`"
+      run "kill -USR2 `cat #{unicorn_pid}`"
     end
 
     desc "Start or upgrade unicorn"
@@ -61,7 +61,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Reopen log files"
     task :reopen_logs, :roles => [:app], :except => { :no_release => true } do
-      sudo "kill -USR1 `cat #{unicorn_pid}`"
+      run "kill -USR1 `cat #{unicorn_pid}`"
     end
 
     namespace :confirm do
