@@ -22,7 +22,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "Start unicorn from scratch"
     task :start, :roles => [:app], :except => { :no_release => true } do
       if !pid_is_running?(unicorn_pid)
-        run "bash -l -c \"cd #{current_path};bundle exec unicorn_rails -c #{unicorn_config} -E #{rails_env} -D\""
+        rvm_run "cd #{current_path};bundle exec unicorn_rails -c #{unicorn_config} -E #{rails_env} -D"
       else
         logger.info "Unicorn already started. Doing nothing."
       end

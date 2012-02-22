@@ -30,6 +30,11 @@ Capistrano::Configuration.instance(:must_exist).load do
     servers
   end
 
+  # Created this because http://beginrescueend.com/integration/capistrano/ doesn't work. Fix this if you can.
+  def rvm_run cmd
+    run "bash -l -c \"#{cmd}\""
+  end
+
   def install_gem(name, options = {})
     version = options[:version]
     gem_cmd = "gem"

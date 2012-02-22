@@ -13,7 +13,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "Stop workling processes"
     task :stop, :roles => :workling do
-      run "bash -l -c \"cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_client stop\""
+      rvm_run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_client stop"
     end
 
     desc "Recover workling jobs"
@@ -27,7 +27,7 @@ Capistrano::Configuration.instance(:must_exist).load do
         break if worklings_stopped
         sleep(5)
       end
-      run "bash -l -c \"cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover\""
+      rvm_run "cd #{current_path}; export RAILS_ENV=#{rails_env}; script/workling_recover"
     end
 
     desc "Kill workling processes"
@@ -47,13 +47,13 @@ Capistrano::Configuration.instance(:must_exist).load do
           "deferred_method_workers__process"
         ]
 
-        run "bash -l -c \"cd #{current_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start\""
+        rvm_run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export QUEUES=#{queues.join(":")}; script/workling_client start"
       end
     end
 
     task :start_manual_import_worklings, :roles => :workling, :only => { :queue => 'manual_import' } do
       number_worklings.times do
-        run "bash -l -c \"cd #{current_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start\""
+        rvm_run "cd #{current_path}; export RAILS_ENV=#{rails_env}; export MAX_PRIORITY=0; export QUEUES=deferred_method_workers__process; script/workling_client start"
       end
     end
   end
